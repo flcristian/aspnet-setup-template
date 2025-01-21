@@ -1,0 +1,12 @@
+.env
+[Bb]in/
+[Oo]bj/
+
+.idea/
+.vs/
+
+.DS_Store
+
+.nuget/
+
+university-certificates.http
