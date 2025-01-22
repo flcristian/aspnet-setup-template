@@ -24,7 +24,7 @@ Env.Load();
 
 builder.WebHost.UseKestrel(options =>
 {
-    options.ListenAnyIP(80);
+    options.ListenAnyIP(8080);
 });
 
 builder.Logging.ClearProviders();
@@ -63,6 +63,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapGet("/hello", () => "Hello world!");
 
 app.UseCors("university-certificates");
 app.Run();

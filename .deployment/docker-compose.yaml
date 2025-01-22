@@ -2,39 +2,29 @@ services:
   api:
     restart: unless-stopped
     container_name: ${COMPOSE_PROJECT_NAME:-app}-api
-    image: ${DCR:-localhost}/${DCR_ORG:-local}/${DCR_REPO:-app}-api:${DCR_TAG:-latest}
-    build:
-      context: .
-      dockerfile: .docker/aspnet/Dockerfile
-      args:
-        USER_ID: ${USER_ID:-1000}
-        GROUP_ID: ${GROUP_ID:-1000}
-        ENVIRONMENT: ${ENVIRONMENT:-development}
+    image: ${DOCKER_USER}/${COMPOSE_PROJECT_NAME}-web-api:latest
     environment:
       - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT:-development}
       - USER_ID=${USER_ID:-1000}
       - GROUP_ID=${GROUP_ID:-1000}
       - ENVIRONMENT=${ENVIRONMENT:-development}
-    volumes:
-      - .:/app:rw
-      - .nuget:/root/.nuget/packages:rw
     ports:
-      - "${API_PORT:-8000}:80"
+      - "${API_PORT:-8000}:8080"
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
       timeout: 3s
       retries: 3
       start_period: 10s
     depends_on:
-      mysql:
+      mariadb:
         condition: service_healthy
 
-  mysql:
-    image: mysql:8.0
-    container_name: ${COMPOSE_PROJECT_NAME:-app}-mysql
+  mariadb:
+    image: yobasystems/alpine-mariadb
+    container_name: ${COMPOSE_PROJECT_NAME:-app}-mariadb
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: ${DB_NAME}
@@ -42,7 +32,7 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - mysql-data:/var/lib/mysql
+      - mariadb-data:/var/lib/mariadb
     ports:
       - "${DB_PORT:-3306}:3306"
     networks:
@@ -59,4 +49,4 @@ networks:
     driver: bridge
 
 volumes:
-  mysql-data:
+  mariadb-data:

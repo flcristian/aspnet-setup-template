@@ -1,4 +1,4 @@
-# Dockerfile
+# .docker/aspnet/Dockerfile
 # Get global arguments
 ARG USERNAME=dotnet
 ARG GROUPNAME=dotnet
@@ -9,10 +9,7 @@ ARG BUILD_DATE
 ARG REVISION
 
 # Base image
-FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS builder
-
-ARG BUILD_DATE
-ARG REVISION
+FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine
 
 # Labels
 LABEL maintainer="flcristian (qflorescucristian@gmail.com)"
@@ -51,23 +48,15 @@ RUN mkdir -p /app /app/tmp && \
 # Set working directory
 WORKDIR /app
 
-# Install development tools for non-production environments
-RUN if [ "$ENVIRONMENT" != "production" ]; then \
-    dotnet tool install --global dotnet-watch; \
-    fi
-
-# Add dotnet tools to PATH
-ENV PATH="${PATH}:/root/.dotnet/tools"
-
-# Create volumes for development
-VOLUME ["/app"]
+# Copy the application files from the correct context
+COPY --chown=${USERNAME}:${GROUPNAME} ../../ .
 
 # Expose ports
-EXPOSE 80
+EXPOSE 8080
 
 # Healthcheck
 HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
-    CMD curl -f http://localhost:80/health || exit 1
+    CMD curl -f http://localhost:8080/health || exit 1
 
-# Use different commands for development and production
-CMD ["sh", "-c", "if [ \"$ENVIRONMENT\" != \"production\" ]; then dotnet watch run --no-launch-profile; else dotnet run --no-launch-profile; fi"]
+# Run the app with watch
+CMD find . -name "*.csproj" -type f -exec dotnet watch run --project {} \;
