@@ -2,6 +2,13 @@
 
 This repository is a template for setting up an ASP.NET project with Docker deployment. It includes all the necessary configurations to streamline development and deployment.
 
+## Necessities
+
+- Dotnet (9.0), you can manually configure it for older versions if you want to.
+- Docker
+
+I configured the web API in such a way that you MUST have a .env file configured in order for it to connect to the database. You can change this if you don't want it.
+
 ## Features
 
 - ASP.NET Core project ready for development.
@@ -13,22 +20,11 @@ This repository is a template for setting up an ASP.NET project with Docker depl
 
 ## Getting Started
 
-### Prerequisites
+### Deployment Prerequisites
 
 - [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
-- A text editor or IDE (e.g., Visual Studio, Visual Studio Code).
 
----
-
-### Development Stage
-
-To run the app, use your normal debugger or the following command:
-
-```bash
-dotnet run
-```
-
-### Setup Instructions
+### Manual Server Deployment Setup Instructions
 
 1. **Clone the repository**:
 
@@ -65,18 +61,65 @@ dotnet run
 3. **Build the app and set it up for deployment**:
 
    ```bash
+   # Windows
    ./setup-deployment.bat
    
-   # Or for MacOS / Linux
-   
+   # MacOS / Linux
    ./setup-deployment.sh
    ```
 
-4. **Access the API**:
+4. **Copy the .deployment folder contents to the directory/server where you want to compose the docker containers**
+5. **Compose the docker containers**
+
+    ```bash
+    # Windows
+    ./Setup.ps1 Setup
+
+    # MacOS / Linux
+    make setup
+    ```
+
+6. **Run the migrations**
+
+    ```bash
+    # Windows
+    ./Setup.ps1 Migrate
+
+    # MacOS / Linux
+    make migrate
+    ```
+
+7. **Access the API**:
 
    The API will be available at `http://localhost:8000` (or the port configured in the `.env` file).
 
----
+### Github Workflow Deployment Setup
+
+If you copy the workflow from ".github/workflows", this will already work, as long as your secrets are correctly set up. If you don't want this, just delete the workflows.
+
+Configure these secrets in your repository's Settings > Secrets and variables > Actions section.
+
+## SSH Configuration
+- `SSH_HOST`: Your server's IP address or domain name
+- `SSH_USERNAME`: Username for SSH access to your server
+- `SSH_PRIVATE_KEY`: The SSH private key for authentication
+
+## Docker Configuration
+- `DOCKER_USER`: Your Docker Hub username
+- `DOCKER_TOKEN`: Your Docker Hub access token
+
+## Project Settings
+- `COMPOSE_PROJECT_NAME`: Name of your Docker Compose project
+- `API_PORT`: Port number for the API service (e.g., 8000)
+- `DEPLOY_PATH`: Path on the server where the project will be deployed
+
+## Database Configuration
+- `DB_NAME`: Name of your database
+- `DB_USER`: Database username
+- `DB_PASSWORD`: Database user password
+- `DB_PORT`: Database port number (e.g., 3308)
+
+All secrets must be set before running the deployment workflow. Missing secrets will cause the deployment to fail.
 
 ## Configuration Details
 
@@ -97,14 +140,9 @@ The `.env` file contains key configurations for the project:
 | `DB_PASSWORD`           | Password for the database connection.                         | `admin`               |
 | `DB_PORT`               | Port for the database connection.                             | `3308`                |
 
----
-
 ## Development Notes
 
 - Ensure the `.env` file is not committed to version control by adding it to your `.gitignore` file.
-- Use the provided `docker-compose.override.yml` for local development customization.
-
----
 
 ## Troubleshooting
 
