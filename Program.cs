@@ -1,7 +1,7 @@
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;    
 using Microsoft.OpenApi.Models;
-using UniversityCertificates.Data;
+using AspnetSetupTemplate.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +10,7 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "University Certificates API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "ASP.NET Setup Template API", Version = "v1" });
 });
 
 string envPath = Path.Combine(Directory.GetCurrentDirectory(), ".env");
@@ -31,7 +31,7 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
 builder.Services.AddCors(options =>
-    options.AddPolicy("university-certificates", domain => domain.WithOrigins("http://localhost:4200")
+    options.AddPolicy("aspnet-setup-template", domain => domain.WithOrigins("http://localhost:4200")
         .AllowAnyHeader()
         .AllowAnyMethod())
 );
@@ -53,7 +53,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "University Certificates API v1");
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "ASP.NET Setup Template API v1");
         c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
     });
 }
@@ -66,5 +66,5 @@ app.MapControllers();
 
 app.MapGet("/hello", () => "Hello world!");
 
-app.UseCors("university-certificates");
+app.UseCors("aspnet-setup-template");
 app.Run();

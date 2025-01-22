@@ -4,7 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>university_certificates</RootNamespace>
+    <RootNamespace>aspnet_setup_template</RootNamespace>
     <RestorePackagesPath>.nuget</RestorePackagesPath>
     <RestoreAdditionalProjectSources>
       .nuget/
