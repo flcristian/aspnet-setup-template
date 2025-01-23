@@ -44,6 +44,7 @@ jobs:
         dotnet restore
 
         # Step 2: Build and push Docker image
+        chmod +x setup-deployment.sh
         ./setup-deployment.sh
     
     - name: Install Docker on remote server
