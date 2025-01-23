@@ -46,6 +46,8 @@ I configured the web API in such a way that you MUST have a .env file configured
      # User Configuration (use your host user ID and group ID)
      USER_ID=1000
      GROUP_ID=1000
+     USERNAME=aspnet
+     GROUPNAME=aspnet
 
      # API Configuration
      API_PORT=8000
@@ -107,6 +109,12 @@ Configure these secrets in your repository's Settings > Secrets and variables > 
 ## Docker Configuration
 - `DOCKER_USER`: Your Docker Hub username
 - `DOCKER_TOKEN`: Your Docker Hub access token
+
+## User Configuration
+- `USER_ID`: Your docker container user id
+- `GROUP_ID`: Your docker container group id
+- `USERNAME`: Your docker container username
+- `GROUPNAME`: Your docker container groupname
 
 ## Project Settings
 - `COMPOSE_PROJECT_NAME`: Name of your Docker Compose project

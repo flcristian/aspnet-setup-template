@@ -27,8 +27,10 @@ jobs:
         cat << EOF > .env
         DOCKER_USER=${{ secrets.DOCKER_USER }}
         COMPOSE_PROJECT_NAME=${{ secrets.COMPOSE_PROJECT_NAME }}
-        USER_ID=1000
-        GROUP_ID=1000
+        USER_ID=${{ secrets.USER_ID }}
+        GROUP_ID=${{ secrets.GROUP_ID }}
+        USERNAME=${{ secrets.USERNAME }}
+        GROUPNAME=${{ secrets.GROUPNAME }}
         API_PORT=${{ secrets.API_PORT }}
         DB_HOST=localhost
         DB_NAME=${{ secrets.DB_NAME }}
