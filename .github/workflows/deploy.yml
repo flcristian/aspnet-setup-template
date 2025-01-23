@@ -44,15 +44,7 @@ jobs:
         dotnet restore
 
         # Step 2: Build and push Docker image
-        IMAGE_NAME=${{ secrets.DOCKER_USER }}/${{ secrets.COMPOSE_PROJECT_NAME }}-web-api
-        docker build -t "${IMAGE_NAME}:latest" \
-          -f .docker/aspnet/Dockerfile \
-          --build-arg USER_ID=1000 \
-          --build-arg GROUP_ID=1000 \
-          --build-arg ENVIRONMENT=development .
-        
-        # Push the image
-        docker push "${IMAGE_NAME}:latest"
+        ./setup-deployment.sh
     
     - name: Install Docker on remote server
       uses: appleboy/ssh-action@master
