@@ -91,10 +91,10 @@ jobs:
         username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          sudo apt update
-          sudo apt upgrade
-          sudo apt install docker-compose
-          sudo apt install make
+          sudo apt update -y
+          sudo apt upgrade -y
+          sudo apt install docker-compose -y
+          sudo apt install make -y
     
     - name: Execute remote commands
       uses: appleboy/ssh-action@master
