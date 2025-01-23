@@ -6,7 +6,7 @@ $DockerCompose = "docker-compose"
 # Function to set up Docker containers
 function Setup {
     Write-Host "Setting up Docker containers..."
-    Invoke-Expression "$DockerCompose up --force-recreate"
+    Invoke-Expression "$DockerCompose up --force-recreate -d"
 }
 
 # Function to clean up Docker containers and volumes

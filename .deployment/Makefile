@@ -11,7 +11,7 @@ all: setup
 # Compose the Docker containers
 setup:
 	@echo "Setting up Docker containers..."
-	$(DOCKER_COMPOSE) up --force-recreate
+	$(DOCKER_COMPOSE) up --force-recreate -d
 
 # Delete the containers and volumes
 clean:
