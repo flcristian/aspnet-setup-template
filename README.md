@@ -118,6 +118,7 @@ Configure these secrets in your repository's Settings > Secrets and variables > 
 
 ## Project Settings
 - `COMPOSE_PROJECT_NAME`: Name of your Docker Compose project
+- `PROJECT NAME`: Name of your project (PROJECT_NAME.csproj)
 - `API_PORT`: Port number for the API service (e.g., 8000)
 - `DEPLOY_PATH`: Path on the server where the project will be deployed
 
