@@ -65,7 +65,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapGet("/hello", () => "Hello world!");
+app.MapGet("/hello", () => "Hello world! Test");
 
 app.UseCors("aspnet-setup-template");
 app.Run();
