@@ -1,62 +1,68 @@
-# .docker/aspnet/Dockerfile
-# Get global arguments
-ARG USERNAME=dotnet
-ARG GROUPNAME=dotnet
-ARG USER_ID=1000
-ARG GROUP_ID=1000
-ARG ENVIRONMENT
-ARG BUILD_DATE
-ARG REVISION
+FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine AS base
+ARG USER_ID=1000 
+ARG GROUP_ID=1000 
+ARG USERNAME=aspnet 
+ARG GROUPNAME=aspnet
 
-# Base image
-FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine
-
-# Labels
-LABEL maintainer="flcristian (qflorescucristian@gmail.com)"
-LABEL org.opencontainers.image.created=${BUILD_DATE}
-LABEL org.opencontainers.image.revision=${REVISION}
-LABEL org.opencontainers.image.title=".NET Development Image"
-LABEL org.opencontainers.image.description="Development-friendly .NET Docker image"
-
-# Set local arguments
-ARG USERNAME
-ARG GROUPNAME
-ARG USER_ID
-ARG GROUP_ID
-ARG ENVIRONMENT
-
-# Set environment variables
-ENV USERNAME=${USERNAME:-dotnet}
-ENV GROUPNAME=${GROUPNAME:-dotnet}
-ENV USER_ID=${USER_ID:-1000}
-ENV GROUP_ID=${GROUP_ID:-1000}
-ENV ENVIRONMENT=${ENVIRONMENT:-production}
-ENV ASPNETCORE_ENVIRONMENT=${ENVIRONMENT:-production}
-ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
-ENV DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
-ENV NUGET_XMLDOC_MODE=skip
-
-# Install required packages and create user
-RUN apk add --no-cache curl && \
+# Set up user and group
+RUN apk add --no-cache shadow && \
     addgroup -g ${GROUP_ID} ${GROUPNAME} && \
-    adduser -D -u ${USER_ID} -G ${GROUPNAME} ${USERNAME}
+    adduser -u ${USER_ID} -G ${GROUPNAME} -D ${USERNAME}
 
-# Create necessary directories and set permissions
-RUN mkdir -p /app /app/tmp && \
-    chown -R ${USERNAME}:${GROUPNAME} /app
-
-# Set working directory
 WORKDIR /app
-
-# Copy the application files from the correct context
-COPY --chown=${USERNAME}:${GROUPNAME} ../../ .
-
-# Expose ports
 EXPOSE 8080
 
-# Healthcheck
-HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
-    CMD curl -f http://localhost:8080/health || exit 1
+# Ensure correct permissions
+RUN chown -R ${USERNAME}:${GROUPNAME} /app
 
-# Run the app with watch
-CMD find . -name "*.csproj" -type f -exec dotnet watch run --project {} \;
+FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS build
+ARG USER_ID=1000 
+ARG GROUP_ID=1000 
+ARG USERNAME=aspnet 
+ARG GROUPNAME=aspnet
+
+# Set up user and group
+RUN apk add --no-cache shadow && \
+    addgroup -g ${GROUP_ID} ${GROUPNAME} && \
+    adduser -u ${USER_ID} -G ${GROUPNAME} -D ${USERNAME}
+
+ENV BUILD_CONFIGURATION=Release
+ENV ASPNETCORE_ENVIRONMENT=Production
+ENV DOTNET_ENVIRONMENT=Production
+
+WORKDIR /src
+COPY . .
+
+RUN dotnet restore "${PROJECT_NAME}.csproj" --verbosity detailed
+
+WORKDIR /src
+RUN dotnet build "${PROJECT_NAME}.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "${PROJECT_NAME}.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
+FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine AS final
+ARG USER_ID=1000 
+ARG GROUP_ID=1000 
+ARG USERNAME=aspnet 
+ARG GROUPNAME=aspnet
+
+# Set up user and group
+RUN apk add --no-cache shadow && \
+    addgroup -g ${GROUP_ID} ${GROUPNAME} && \
+    adduser -u ${USER_ID} -G ${GROUPNAME} -D ${USERNAME}
+
+WORKDIR /app
+COPY --from=publish /app/publish . 
+COPY .env .
+
+RUN mkdir -p /app && \
+    chown -R ${USERNAME}:${GROUPNAME} /app
+
+USER ${USER_ID}:${GROUP_ID}
+
+# Set production environment variables
+ENV ASPNETCORE_ENVIRONMENT=Production
+ENV DOTNET_ENVIRONMENT=Production
+
+ENTRYPOINT ["dotnet", "${PROJECT_NAME}.dll"]

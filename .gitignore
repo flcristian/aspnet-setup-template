@@ -10,3 +10,5 @@
 .nuget/
 
 aspnet-setup-template.http
+
+Dockerfile

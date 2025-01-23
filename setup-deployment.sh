@@ -10,24 +10,49 @@ if [ ! -f .env ]; then
     exit 1
 fi
 
-# Read components from .env file
-DOCKER_USER=$(grep DOCKER_USER .env | cut -d '=' -f2 | tr -d ' ')
-COMPOSE_PROJECT_NAME=$(grep COMPOSE_PROJECT_NAME .env | cut -d '=' -f2 | tr -d ' ')
+# Load environment variables
+set -a
+source .env
+set +a
+
+# Trim whitespace from variables
+DOCKER_USER=$(echo "$DOCKER_USER" | xargs)
+COMPOSE_PROJECT_NAME=$(echo "$COMPOSE_PROJECT_NAME" | xargs)
+USER_ID=$(echo "$USER_ID" | xargs)
+GROUP_ID=$(echo "$GROUP_ID" | xargs)
+USERNAME=$(echo "$USERNAME" | xargs)
+GROUPNAME=$(echo "$GROUPNAME" | xargs)
+PROJECT_NAME=$(echo "$PROJECT_NAME" | xargs)
+API_PORT=$(echo "$API_PORT" | xargs)
+DB_HOST=$(echo "$DB_HOST" | xargs)
+DB_NAME=$(echo "$DB_NAME" | xargs)
+DB_USER=$(echo "$DB_USER" | xargs)
+DB_PASSWORD=$(echo "$DB_PASSWORD" | xargs)
+DB_PORT=$(echo "$DB_PORT" | xargs)
 
 # Construct IMAGE_NAME
 IMAGE_NAME="${DOCKER_USER}/${COMPOSE_PROJECT_NAME}-web-api"
 
-# Execute docker build
-docker build -t "${IMAGE_NAME}:latest" \
-    -f .docker/aspnet/Dockerfile \
-    --build-arg USER_ID=1000 \
-    --build-arg GROUP_ID=1000 \
-    --build-arg ENVIRONMENT=development .
+# Copy Dockerfile from .docker/aspnet to root
+cp ".docker/aspnet/Dockerfile" Dockerfile
+
+# Configure the Dockerfile and replace ${PROJECT_NAME}
+sed -i "s/\${PROJECT_NAME}/${PROJECT_NAME}/g" Dockerfile
+
+# Execute docker build with environment variables
+docker build --no-cache \
+    --build-arg USER_ID="${USER_ID}" \
+    --build-arg GROUP_ID="${GROUP_ID}" \
+    --build-arg USERNAME="${USERNAME}" \
+    --build-arg GROUPNAME="${GROUPNAME}" \
+    --build-arg BUILD_CONFIGURATION=Release \
+    --build-arg PROJECT_NAME="${PROJECT_NAME}" \
+    -t "${IMAGE_NAME}:latest" .
 
 # Push the image
 docker push "${IMAGE_NAME}:latest"
 
-# Copy .env file to deployment directory
+# Copy .env to deployment directory
 cp .env .deployment/.env
 
 echo "Build completed successfully!"
