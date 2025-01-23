@@ -84,6 +84,18 @@ jobs:
         target: "deployment/"
         strip_components: 1
     
+    - name: Install requirements on remote server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          sudo apt update
+          sudo apt upgrade
+          sudo apt install docker-compose
+          sudo apt install make
+    
     - name: Execute remote commands
       uses: appleboy/ssh-action@master
       with:
