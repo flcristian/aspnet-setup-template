@@ -4,6 +4,7 @@
 
 .idea/
 .vs/
+.vscode/
 
 .DS_Store
 
@@ -11,4 +12,4 @@
 
 aspnet-setup-template.http
 
-Dockerfile
+/Dockerfile
