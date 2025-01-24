@@ -20,6 +20,8 @@ I configured the web API in such a way that you MUST have a .env file configured
 
 ## Getting Started
 
+For any deployment method, you must create a .nuget folder at the project root!
+
 ### Deployment Prerequisites
 
 - [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
